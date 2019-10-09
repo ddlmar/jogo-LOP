@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+<head>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="#">
+<script type="text/javascript" src="#"></script>
+</head>
+<style>
+	canvas{
+		border: solid 1px;
+		position: absolute;
+		margin-right: 50%;
+		margin-left: 50%;
+		left: -300px;
+		top: 30px;
+	}
+</style>
+<body>
+	<p>
+		Mova o objeto azul com as setas do teclado.<br/>
+		Perceba que, em caso de colisão, <br/> 
+		ele muda de cor!
+	</p>
+	<canvas width="600" height="400"></canvas>
+</body>
+<script>
+	//Constantes para movimentação
+	var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40;
+	//Constante que define o tamanho dos objetos
+	var SIZE = 50;
+	//Associação da variável cnv ao elemento canvas
+	var cnv = document.querySelector("canvas");
+	//Atribuição do contexto 2d à variável ctx
+	var ctx = cnv.getContext("2d");
+	//Variáveis que controlarão a posição do objeto
+	var posX = 50;
+	var posY = 50;
+	//Variável que determina a cor do objeto
+	var objColor = "#00f";
+	//Variáveis que estabelecem a posição do bloco
+	var blockX = cnv.width/2 - 25;
+	var blockY = cnv.height/2 - 25;
+	//Variáveis que controlam a movimentação
+	var mvLeft = mvUp = mvRight = mvDown = false;
+
+	//Atualiza a posição do objeto
+	function updateBlock(){
+		if(mvUp){
+			posY--;
+		}
+		if(mvDown){
+			posY++;
+		}
+		if(mvLeft){
+			posX--;
+		}
+		if(mvRight){
+			posX++;
+		}
+	}
+
+	//Confere colisão e, em caso de colisão, muda a cor do objeto para vermelho
+	function colide(){
+		if  (posX + SIZE > blockX		//Confere colisão pela direita 
+			&& posX < blockX + SIZE 	//Confere colisão pela esquerda
+			&& posY + SIZE > blockY 	//Confere colisão por cima
+			&& posY < blockY + SIZE){	//Confere colisão por baixo
+				objColor = "#f00";
+		} else {
+			objColor = "#00f";
+		}
+	}
+
+	//Entrada de comandos
+	//Move o objeto
+	window.addEventListener("keydown",keydownHandler,false);
+
+	function keydownHandler(e){
+		var key = e.keyCode;
+		switch(key){
+			case UP:
+				mvUp = true;
+				break;
+			case DOWN:
+				mvDown = true;
+				break;
+			case LEFT:
+				mvLeft = true;
+				break;
+			case RIGHT:
+				mvRight = true;
+				break;
+		}
+	}
+
+	//Para o objeto
+	window.addEventListener("keyup",keyupHandler,false);
+	function keyupHandler(e){
+		var key = e.keyCode;
+		switch(key){
+			case UP:
+				mvUp = false;
+				break;
+			case DOWN:
+				mvDown = false;
+				break;
+			case LEFT:
+				mvLeft = false;
+				break;
+			case RIGHT:
+				mvRight = false;
+				break;
+		}
+	}
+
+	//desenha na tela
+	function draw(){
+		ctx.clearRect(0,0,cnv.width,cnv.height);
+		//muda a cor para preto e desenha no centro da tela
+		ctx.fillStyle = "#000";
+		ctx.fillRect(blockX,blockY,SIZE,SIZE);
+		//Muda a cor do contexto segundo a cor do objeto
+		ctx.fillStyle = objColor;
+		ctx.fillRect(posX,posY,SIZE,SIZE);
+	}
+
+	//atualiza os objetos
+	function update(){
+		updateBlock();
+		colide();
+		draw();
+	}
+
+	//Repetição
+	function loop(){
+		update();
+		window.requestAnimationFrame(loop, cnv);
+	}
+	loop();
+
+</script>
+</html>
